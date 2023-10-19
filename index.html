@@ -6,6 +6,32 @@
       rel="stylesheet"
       href="https://fonts.googleapis.com/icon?family=Material+Icons"
     />
+    <script>
+      !(function (w, d, i, s) {
+        function l() {
+          if (!d.getElementById(i)) {
+            var f = d.getElementsByTagName(s)[0],
+              e = d.createElement(s);
+            (e.type = "text/javascript"),
+              (e.async = !0),
+              (e.src = "https://canny.io/sdk.js"),
+              f.parentNode.insertBefore(e, f);
+          }
+        }
+        if ("function" != typeof w.Canny) {
+          var c = function () {
+            c.q.push(arguments);
+          };
+          (c.q = []),
+            (w.Canny = c),
+            "complete" === d.readyState
+              ? l()
+              : w.attachEvent
+              ? w.attachEvent("onload", l)
+              : w.addEventListener("load", l, !1);
+        }
+      })(window, document, "canny-jssdk", "script");
+    </script>
     <style>
       * {
         user-select: none;
@@ -162,6 +188,9 @@
     </div>
     <div class="container">
       <div class="flexgrow"></div>
+      <button data-canny-changelog class="material-button">
+        <i class="material-icons">notifications</i>
+      </button>
       <button
         onclick="openSettings()"
         oncontextmenu="openFullscreenIframe()"
@@ -200,6 +229,14 @@
       function closeSettings() {
         document.querySelector(".settings").classList.add("hide");
       }
+    </script>
+    <script>
+      Canny("initChangelog", {
+        appID: "6507d106682dfb09dd9439d6",
+        position: "bottom",
+        align: "right",
+        theme: "dark", // options: light [default], dark, auto
+      });
     </script>
   </body>
 </html>
