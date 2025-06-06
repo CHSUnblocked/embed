@@ -1,250 +1,295 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;400&display=swap"
-      rel="stylesheet"
-    />
-    <link
-      rel="stylesheet"
-      href="https://fonts.googleapis.com/icon?family=Material+Icons"
-    />
-    <script>
-      !(function (w, d, i, s) {
-        function l() {
-          if (!d.getElementById(i)) {
-            var f = d.getElementsByTagName(s)[0],
-              e = d.createElement(s);
-            (e.type = "text/javascript"),
-              (e.async = !0),
-              (e.src = "https://canny.io/sdk.js"),
-              f.parentNode.insertBefore(e, f);
-          }
-        }
-        if ("function" != typeof w.Canny) {
-          var c = function () {
-            c.q.push(arguments);
-          };
-          (c.q = []),
-            (w.Canny = c),
-            "complete" === d.readyState
-              ? l()
-              : w.attachEvent
-              ? w.attachEvent("onload", l)
-              : w.addEventListener("load", l, !1);
-        }
-      })(window, document, "canny-jssdk", "script");
-    </script>
-    <style>
-      * {
-        user-select: none;
-        box-sizing: border-box;
-        font-family: 'Roboto', sans-serif;
-      }
-      .flexgrow {
-        flex-grow: 1;
-      }
-      body,
-      html {
-        width: 100%;
-        height: 100%;
-        padding: 0;
-        margin: 0;
-      }
-
-      iframe {
-        flex-grow: 1;
-        outline: 0;
-        border: 0;
-        border-radius: 4px;
-        margin: 5px;
-      }
-
-      body {
-        display: flex;
-        flex-direction: column;
-      }
-
-      .container {
-        display: flex;
-        gap: 5px;
-        padding: 5px;
-        align-items: center;
-        color: white;
-      }
-
-      .material-button {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        background-color: #222;
-        border: none;
-        border-radius: 4px;
-        padding: 8px 16px;
-        color: #fff;
-        text-decoration: none;
-        cursor: pointer;
-        font-size: 16px;
-      }
-
-      .fullscreen-iframe {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        border: none;
-      }
-      .settingsbtn:active > i {
-        rotate: 60deg;
-      }
-      .settingsbtn > i {
-        transition-duration: 0.3s;
-      }
-      .closebtn:active > i {
-        rotate: 90deg;
-      }
-      .closebtn > i {
-        transition-duration: 0.3s;
-      }
-      .settings {
-        z-index: 999;
-        width: 100%;
-        height: 100%;
-        position: fixed;
-        background-color: #111;
-        transition-duration: 0.3s;
-        right: 0;
-        color: white;
-        padding: 5px;
-        border-radius: 4px;
-      }
-      .settings.hide {
-        right: -100%;
-      }
-      h2 {
-        padding: 0;
-        margin: 0;
-        font-weight: 400;
-      }
-
-      select,
-      input {
-        background-color: transparent;
-        border: 0;
-        color: white;
-      }
-      input {
-        border: solid 1px;
-        border-radius: 5px;
-      }
-      option {
-        color: black;
-      }
-      .settings > .container {
-        display: flex;
-        gap: 5px;
-        padding: 0px;
-        align-items: center;
-        color: white;
-      }
-      .box {
-        background-color: #222;
-        border-radius: 10px;
-        padding: 20px;
-        margin: 10px;
-      }
-    </style>
-  </head>
-
-  <body>
-    <div class="settings hide">
-      <div class="container">
-        <button onclick="closeSettings()" class="material-button closebtn">
-          <i class="material-icons">close</i>
-        </button>
-
-        <h2 style="font-weight: 100;">Open</h2>
-        <div class="flexgrow"></div>
-        <button onclick="openFullscreenIframe()" class="material-button">
-          <i class="material-icons">open_in_new</i>
-        </button>
-      </div>
-      <div class="box">
-        Open in
-        <select id="openin">
-          <option value="tab" selected>Tab</option>
-          <option value="window">Window</option>
-        </select>
-      </div>
-      <div class="box">
-        Window Name: <input value="Google" type="text" id="name" />
-      </div>
-      <div class="box">
-        Icon URL (Currently not working):
-        <input
-          value="https://www.google.com/favicon.ico
-"
-          type="text"
-          id="iconurl"
+    <head>
+        <meta charset="UTF-8" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;400&display=swap"
+            rel="stylesheet"
         />
-      </div>
-    </div>
-    <div class="container">
-      Note: The save in fullscreen and in the embed is different
-      <div class="flexgrow"></div>
-      <button data-canny-changelog class="material-button">
-        <i class="material-icons">notifications</i>
-      </button>
-      <button
-        onclick="openSettings()"
-        oncontextmenu="openFullscreenIframe()"
-        class="material-button"
-      >
-        <i class="material-icons">open_in_new</i>
-      </button>
-    </div>
-    <script>
-      var url = new URLSearchParams(window.location.search).get("url");
-      var frame = document.createElement("iframe");
-      frame.src = url;
-      document.body.append(frame);
-      function openFullscreenIframe() {
-        var thirdArg = "";
-        if (document.getElementById("openin").value == "window") {
-          thirdArg = "width=300,height=300";
-        }
-        window.newTab = window.open("", "_blank", thirdArg);
-        newTab.document.write(
-          `<title>${
-            document.getElementById("name").value
-          }</title><link rel="icon" type="image/x-icon" href="${
-            document.getElementById("iconurl").value
-          }"><style>*{width:100%;height:100%;outline:0;border:0;padding:0;margin:0;}</style><iframe allow-pointer-lock id='frame' class="fullscreen-iframe" src="${url}"></iframe><script>setTimeout(function () {document.getElementById('frame').focus()}, 1000);</sc` +
-            `ript>`
-        );
-        document.body.innerHTML = `<style>*{padding:0;margin:0;width:100%;height:100%;}</style><div style="background-color:#1c1c1c;border-radius:4px;display:flex;align-items:center;justify-content:center;color:white;cursor:pointer" onclick="newTab.close();location.reload()">Bring Back Here</div>`;
-        newTab.onbeforeunload = function () {
-          location.reload();
-        };
-      }
-      function openSettings() {
-        document.querySelector(".settings").classList.remove("hide");
-      }
-      function closeSettings() {
-        document.querySelector(".settings").classList.add("hide");
-      }
-    </script>
-    <script>
-      Canny("initChangelog", {
-        appID: "6507d106682dfb09dd9439d6",
-        position: "bottom",
-        align: "right",
-        theme: "light",
-      });
-    </script>
-  </body>
+        <link
+            rel="stylesheet"
+            href="https://fonts.googleapis.com/icon?family=Material+Icons"
+        />
+        <script>
+            !(function (w, d, i, s) {
+                function l() {
+                    if (!d.getElementById(i)) {
+                        var f = d.getElementsByTagName(s)[0],
+                            e = d.createElement(s);
+                        (e.type = "text/javascript"),
+                            (e.async = !0),
+                            (e.src = "https://canny.io/sdk.js"),
+                            f.parentNode.insertBefore(e, f);
+                    }
+                }
+                if ("function" != typeof w.Canny) {
+                    var c = function () {
+                        c.q.push(arguments);
+                    };
+                    (c.q = []),
+                        (w.Canny = c),
+                        "complete" === d.readyState
+                            ? l()
+                            : w.attachEvent
+                              ? w.attachEvent("onload", l)
+                              : w.addEventListener("load", l, !1);
+                }
+            })(window, document, "canny-jssdk", "script");
+        </script>
+        <style>
+            * {
+                user-select: none;
+                box-sizing: border-box;
+                font-family: "Roboto", sans-serif;
+            }
+            .flexgrow {
+                flex-grow: 1;
+            }
+            body,
+            html {
+                width: 100%;
+                height: 100%;
+                padding: 0;
+                margin: 0;
+            }
+
+            iframe {
+                flex-grow: 1;
+                outline: 0;
+                border: 0;
+                border-radius: 4px;
+                margin: 5px;
+            }
+
+            body {
+                display: flex;
+                flex-direction: column;
+            }
+
+            .container {
+                display: flex;
+                gap: 5px;
+                padding: 5px;
+                align-items: center;
+                color: white;
+            }
+
+            .material-button {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                background-color: #222;
+                border: none;
+                border-radius: 4px;
+                padding: 8px 16px;
+                color: #fff;
+                text-decoration: none;
+                cursor: pointer;
+                font-size: 16px;
+            }
+
+            .fullscreen-iframe {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                border: none;
+            }
+            .settingsbtn:active > i {
+                rotate: 60deg;
+            }
+            .settingsbtn > i {
+                transition-duration: 0.3s;
+            }
+            .closebtn:active > i {
+                rotate: 90deg;
+            }
+            .closebtn > i {
+                transition-duration: 0.3s;
+            }
+            .settings {
+                z-index: 999;
+                width: 100%;
+                height: 100%;
+                position: fixed;
+                background-color: #111;
+                transition-duration: 0.3s;
+                right: 0;
+                color: white;
+                padding: 5px;
+                border-radius: 4px;
+            }
+            .settings.hide {
+                right: -100%;
+            }
+            h2 {
+                padding: 0;
+                margin: 0;
+                font-weight: 400;
+            }
+
+            select,
+            input {
+                background-color: transparent;
+                border: 0;
+                color: white;
+            }
+            input {
+                border: solid 1px;
+                border-radius: 5px;
+            }
+            option {
+                color: black;
+            }
+            .settings > .container {
+                display: flex;
+                gap: 5px;
+                padding: 0px;
+                align-items: center;
+                color: white;
+            }
+            .box {
+                background-color: #222;
+                border-radius: 10px;
+                padding: 20px;
+                margin: 10px;
+            }
+            .notice {
+                background-color: #222222ee;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                color: white;
+                padding: 5px;
+                justify-content: center;
+                align-items: center;
+                display: flex;
+                flex-direction: column;
+                gap: 8px;
+            }
+            .notice > * {
+                margin: 0;
+            }
+        </style>
+    </head>
+
+    <body>
+        <div class="notice">
+            <h1>CHSUnblocked is going away (at some point)</h1>
+            <h2>
+                It is being replaced by EduTools, a new, easier to maintain,
+                harder to block site
+            </h2>
+            <div style="display: flex; flex-direction: row; gap: 8px">
+                <a
+                    href="https://sites.google.com/schoolsnet.act.edu.au/chsunblocked/deprecation"
+                    target="_blank"
+                    class="material-button"
+                    >Learn more</a
+                >
+                <button
+                    class="material-button"
+                    onclick="document.querySelector('.notice').remove()"
+                >
+                    Close
+                </button>
+            </div>
+        </div>
+        <div class="settings hide">
+            <div class="container">
+                <button
+                    onclick="closeSettings()"
+                    class="material-button closebtn"
+                >
+                    <i class="material-icons">close</i>
+                </button>
+
+                <h2 style="font-weight: 100">Open</h2>
+                <div class="flexgrow"></div>
+                <button
+                    onclick="openFullscreenIframe()"
+                    class="material-button"
+                >
+                    <i class="material-icons">open_in_new</i>
+                </button>
+            </div>
+            <div class="box">
+                Open in
+                <select id="openin">
+                    <option value="tab" selected>Tab</option>
+                    <option value="window">Window</option>
+                </select>
+            </div>
+            <div class="box">
+                Window Name: <input value="Google" type="text" id="name" />
+            </div>
+            <div class="box">
+                Icon URL (Currently not working):
+                <input
+                    value="https://www.google.com/favicon.ico
+"
+                    type="text"
+                    id="iconurl"
+                />
+            </div>
+        </div>
+        <div class="container">
+            Note: The save in fullscreen and in the embed is different
+            <div class="flexgrow"></div>
+            <button data-canny-changelog class="material-button">
+                <i class="material-icons">notifications</i>
+            </button>
+            <button
+                onclick="openSettings()"
+                oncontextmenu="openFullscreenIframe()"
+                class="material-button"
+            >
+                <i class="material-icons">open_in_new</i>
+            </button>
+        </div>
+        <script>
+            var url = new URLSearchParams(window.location.search).get("url");
+            var frame = document.createElement("iframe");
+            frame.src = url;
+            document.body.append(frame);
+            function openFullscreenIframe() {
+                var thirdArg = "";
+                if (document.getElementById("openin").value == "window") {
+                    thirdArg = "width=300,height=300";
+                }
+                window.newTab = window.open("", "_blank", thirdArg);
+                newTab.document.write(
+                    `<title>${
+                        document.getElementById("name").value
+                    }</title><link rel="icon" type="image/x-icon" href="${
+                        document.getElementById("iconurl").value
+                    }"><style>*{width:100%;height:100%;outline:0;border:0;padding:0;margin:0;}</style><iframe allow-pointer-lock id='frame' class="fullscreen-iframe" src="${url}"></iframe><script>setTimeout(function () {document.getElementById('frame').focus()}, 1000);</sc` +
+                        `ript>`,
+                );
+                document.body.innerHTML = `<style>*{padding:0;margin:0;width:100%;height:100%;}</style><div style="background-color:#1c1c1c;border-radius:4px;display:flex;align-items:center;justify-content:center;color:white;cursor:pointer" onclick="newTab.close();location.reload()">Bring Back Here</div>`;
+                newTab.onbeforeunload = function () {
+                    location.reload();
+                };
+            }
+            function openSettings() {
+                document.querySelector(".settings").classList.remove("hide");
+            }
+            function closeSettings() {
+                document.querySelector(".settings").classList.add("hide");
+            }
+        </script>
+        <script>
+            Canny("initChangelog", {
+                appID: "6507d106682dfb09dd9439d6",
+                position: "bottom",
+                align: "right",
+                theme: "light",
+            });
+        </script>
+    </body>
 </html>
